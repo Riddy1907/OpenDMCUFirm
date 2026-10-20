@@ -24,6 +24,7 @@ static BOOL sBaseValid = FALSE;
 
 static uint32_t sOrigHorzFilter = 0;
 static uint32_t sOrigVertFilter = 0;
+static uint32_t sOrigTaps = 0;
 static BOOL sOrigValid = FALSE;
 
 void SCALER_SetTVBaseOverscan(uint16_t left, uint16_t right)
@@ -66,6 +67,7 @@ void SCALER_ApplyTV(void)
     if (!sOrigValid) {
         sOrigHorzFilter = DC_Read32(D1SCL_HORZ_FILTER_CONTROL);
         sOrigVertFilter = DC_Read32(D1SCL_VERT_FILTER_CONTROL);
+        sOrigTaps = DC_Read32(D1SCL_TAP_CONTROL);
         sOrigValid = TRUE;
     }
 
@@ -79,6 +81,7 @@ void SCALER_ApplyTV(void)
         writeOverscan(sBaseLeft, sBaseRight, 0, 0);
         DC_Write32(D1SCL_HORZ_FILTER_CONTROL, sOrigHorzFilter);
         DC_Write32(D1SCL_VERT_FILTER_CONTROL, sOrigVertFilter);
+        DC_Write32(D1SCL_TAP_CONTROL, sOrigTaps);
         return;
     }
 
@@ -114,8 +117,21 @@ void SCALER_ApplyTV(void)
 
     writeOverscan((uint16_t) (sBaseLeft + extra / 2), (uint16_t) (sBaseRight + (extra - extra / 2)), top, bottom);
 
+#if SHARP_MODE >= 4
+    /* PICK_NEAREST may only be honoured in 2-tap mode -> force 2 vertical taps (and horizontal in mode 5) */
+    {
+        uint32_t taps = sOrigTaps & ~((uint32_t) SCL_VERT_NUM_OF_TAPS_MASK << SCL_VERT_NUM_OF_TAPS_SHIFT);
+        taps |= SCL_VERT_NUM_OF_TAPS(1);
+#if SHARP_MODE == 5
+        taps &= ~((uint32_t) SCL_HORZ_NUM_OF_TAPS_MASK << SCL_HORZ_NUM_OF_TAPS_SHIFT);
+        taps |= SCL_HORZ_NUM_OF_TAPS(1);
+#endif
+        DC_Write32(D1SCL_TAP_CONTROL, taps);
+    }
+#endif
+
     DC_Write32(D1SCL_VERT_FILTER_CONTROL, SCL_V_FILTER_PICK_NEAREST);
-#if SHARP_MODE >= 2
+#if SHARP_MODE == 2 || SHARP_MODE == 5
     DC_Write32(D1SCL_HORZ_FILTER_CONTROL, SCL_H_FILTER_PICK_NEAREST);
 #else
     DC_Write32(D1SCL_HORZ_FILTER_CONTROL, sOrigHorzFilter);

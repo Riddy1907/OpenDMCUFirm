@@ -16,6 +16,8 @@
  *       aspect ratio is preserved by shrinking the horizontal size accordingly
  *   2 = like 1, but horizontal scaling also uses nearest neighbour
  *   3 = full screen (no borders), vertical nearest neighbour at the non-integer ratio
+ *   4 = like 1, but also forces the vertical scaler into 2-tap mode
+ *   5 = like 2, but forces both scalers into 2-tap mode (diagnostic: should look clearly pixelated)
  */
 #ifndef SHARP_MODE
 #define SHARP_MODE 1

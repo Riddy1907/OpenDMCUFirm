@@ -22,6 +22,7 @@ jobs:
               exit 1
             fi
             test -s dmcu.d.hex
+            echo "::notice title=size-mode$mode::$(wine /gnu-68hc1x/app/bin/m6811-elf-size.exe dmcu.elf 2>/dev/null | tail -1)"
             cp dmcu.d.hex "out/dmcu_mode${mode}.d.hex"
           done
           ls -la out

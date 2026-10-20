@@ -89,7 +89,18 @@ void SCALER_ApplyTV(void)
 
     /* horizontal: keep aspect ratio of the stock (full height) picture */
     baseW = (uint16_t) (outW - sBaseLeft - sBaseRight);
-    newW = (uint16_t) (((uint32_t) baseW * dstH) / outH);
+    /* newW = baseW * dstH / outH, using only 16 bit math (no libgcc helpers, ERAM is tiny) */
+    newW = 0;
+    {
+        uint16_t i, r = 0;
+        for (i = 0; i < baseW; i++) {
+            r += dstH;
+            while (r >= outH) {
+                r -= outH;
+                newW++;
+            }
+        }
+    }
     extra = (uint16_t) (baseW - newW);
 
     writeOverscan((uint16_t) (sBaseLeft + extra / 2), (uint16_t) (sBaseRight + (extra - extra / 2)), top, bottom);

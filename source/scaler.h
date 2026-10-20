@@ -15,6 +15,7 @@
  *   1 = integer 2x vertical line doubling (nearest neighbour), horizontal stays smooth,
  *       aspect ratio is preserved by shrinking the horizontal size accordingly
  *   2 = like 1, but horizontal scaling also uses nearest neighbour
+ *   3 = full screen (no borders), vertical nearest neighbour at the non-integer ratio
  */
 #ifndef SHARP_MODE
 #define SHARP_MODE 1

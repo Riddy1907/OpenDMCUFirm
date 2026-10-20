@@ -15,7 +15,7 @@ jobs:
       - name: Build variants
         run: |
           mkdir -p out
-          for mode in 0 1 2; do
+          for mode in 0 1 2 3; do
             make clean
             if ! make V=1 PREFIX='wine /gnu-68hc1x/app/bin/m6811-elf-' SUFFIX='.exe' SHARP_MODE=$mode > build.log 2>&1; then
               grep -v "^wine" build.log | grep -v "^\s*$" | tail -n 9 | while IFS= read -r l; do echo "::error title=mode$mode::$l"; done
@@ -36,6 +36,7 @@ jobs:
           dmcu_mode0.d.hex  OpenDMCUFirm unveraendert (zuerst testen)
           dmcu_mode1.d.hex  vertikal 2x scharf, horizontal weich  <- empfohlen
           dmcu_mode2.d.hex  vertikal 2x + horizontal Nearest Neighbor (Pixel-Look)
+          dmcu_mode3.d.hex  Vollbild ohne Rand, vertikal Nearest Neighbor (ungleichmaessige Zeilen)
 
           Modus 1/2 greifen nur, wenn die Wii U auf 1080p steht.
           TXT

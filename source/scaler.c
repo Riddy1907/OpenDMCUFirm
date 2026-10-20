@@ -82,6 +82,15 @@ void SCALER_ApplyTV(void)
         return;
     }
 
+#if SHARP_MODE == 3
+    /* full screen, no integer scaling: only switch the vertical filter to nearest neighbour */
+    (void) dstH; (void) top; (void) bottom; (void) baseW; (void) newW; (void) extra;
+    writeOverscan(sBaseLeft, sBaseRight, 0, 0);
+    DC_Write32(D1SCL_VERT_FILTER_CONTROL, SCL_V_FILTER_PICK_NEAREST);
+    DC_Write32(D1SCL_HORZ_FILTER_CONTROL, sOrigHorzFilter);
+    return;
+#endif
+
     /* vertical: exactly 2x, centered */
     dstH = (uint16_t) (srcH * 2);
     top = (uint16_t) ((outH - dstH) / 2);

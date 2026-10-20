@@ -43,8 +43,10 @@ INCLUDES	:=	include
 #-------------------------------------------------------------------------------
 # options for code generation
 #-------------------------------------------------------------------------------
+SHARP_MODE	?=	1
+
 CFLAGS	:=	-Wall -Os -std=gnu99 -fomit-frame-pointer -m68hc11 -mshort \
-			$(INCLUDE)
+			-DSHARP_MODE=$(SHARP_MODE) $(INCLUDE)
 
 CXXFLAGS	:= $(CFLAGS)
 

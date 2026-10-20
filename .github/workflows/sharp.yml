@@ -1,0 +1,43 @@
+name: Build sharp-scaling variants
+
+on: [push, workflow_dispatch]
+
+jobs:
+  build-variants:
+    runs-on: ubuntu-latest
+    container: garyodernichts/dmcubuilder
+    env:
+      WINEPREFIX: /root/.wine
+
+    steps:
+      - uses: actions/checkout@main
+
+      - name: Build variants
+        run: |
+          mkdir -p out
+          for mode in 0 1 2; do
+            make clean
+            make PREFIX='wine /gnu-68hc1x/app/bin/m6811-elf-' SUFFIX='.exe' SHARP_MODE=$mode
+            test -s dmcu.d.hex
+            cp dmcu.d.hex "out/dmcu_mode${mode}.d.hex"
+          done
+          ls -la out
+          echo "::notice title=sizes::$(wc -c out/*.hex | tr '\n' ' ')"
+          cat > out/LIESMICH.txt <<'TXT'
+          OpenDMCUFirm - Testbuilds fuer scharfe Skalierung im vWii-Modus
+
+          Gewuenschte Variante in dmcu.d.hex umbenennen, nach sd:/wiiu/dmcu.d.hex kopieren
+          und im evWii-Plugin "Load DMCU Firmware from SD Card" aktivieren.
+
+          dmcu_mode0.d.hex  OpenDMCUFirm unveraendert (zuerst testen)
+          dmcu_mode1.d.hex  vertikal 2x scharf, horizontal weich  <- empfohlen
+          dmcu_mode2.d.hex  vertikal 2x + horizontal Nearest Neighbor (Pixel-Look)
+
+          Modus 1/2 greifen nur, wenn die Wii U auf 1080p steht.
+          TXT
+
+      - uses: actions/upload-artifact@main
+        with:
+          name: dmcu-sharp-variants
+          path: out/
+          if-no-files-found: error

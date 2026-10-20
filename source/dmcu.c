@@ -13,6 +13,7 @@
 #include "fvi.h"
 #include "deint.h"
 #include "overscan.h"
+#include "scaler.h"
 
 #include <asm-m68hc11/ports_def.h>
 
@@ -275,6 +276,8 @@ void DMCU_Setup()
         udelay(0x286);
 
         DEINT_Configure(FVI_VIDEO_MODE_480I);
+
+        SCALER_ApplyTV();
     } else {
         DEBUG_Write0x6(0x10);
         gDmcuState.unk0x0E = 0x2;
@@ -753,6 +756,8 @@ void configureVideoStandardHD(DMCUState* state, FVIVideoMode videoMode)
     DVO_SetEnable(1);
     DVO_RunVIClockAll();
     udelay(0x286);
+
+    SCALER_ApplyTV();
 }
 
 void configureVideoStandardSD(DMCUState* state, FVIVideoMode videoMode)

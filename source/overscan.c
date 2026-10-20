@@ -5,6 +5,7 @@
 #include "dc.h"
 #include "debug.h"
 #include "conf.h"
+#include "scaler.h"
 
 uint32_t DMCU_MboxRead(void)
 {
@@ -22,6 +23,10 @@ uint8_t setupOverscan(DisplayType display, uint32_t left, uint32_t right)
 
     if (addr != 0) {
         DC_Write32(addr, MODE_EXT_OVERSCAN_LEFT(left) | MODE_EXT_OVERSCAN_RIGHT(right));
+        if (display == DISPLAY_TV) {
+            SCALER_SetTVBaseOverscan((uint16_t) left, (uint16_t) right);
+            SCALER_ApplyTV();
+        }
         return TRUE;
     }
 

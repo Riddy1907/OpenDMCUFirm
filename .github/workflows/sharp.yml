@@ -18,7 +18,7 @@ jobs:
           for mode in 0 1 2; do
             make clean
             if ! make V=1 PREFIX='wine /gnu-68hc1x/app/bin/m6811-elf-' SUFFIX='.exe' SHARP_MODE=$mode > build.log 2>&1; then
-              tail -n 25 build.log | while IFS= read -r l; do echo "::error title=mode$mode::$l"; done
+              grep -v "^wine" build.log | grep -v "^\s*$" | tail -n 9 | while IFS= read -r l; do echo "::error title=mode$mode::$l"; done
               exit 1
             fi
             test -s dmcu.d.hex
